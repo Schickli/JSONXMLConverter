@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>A Blockly-based visual editor for JSON structures.</title>
+  <head>
+    <meta charset="utf-8" />
+    <title>AR-Scene Builder</title>
 
     <script type="text/javascript" src="blockly_compressed.js"></script>
 
@@ -25,65 +25,108 @@
     <script type="text/javascript" src="menuly_2blocks.js"></script>
 
     <script>
+      function updateJSONarea() {
+        document.getElementById("json_area").value = Blockly.JSON.fromWorkspace(
+          Blockly.getMainWorkspace()
+        );
 
-        function updateJSONarea() {
-            document.getElementById('json_area').value = Blockly.JSON.fromWorkspace( Blockly.getMainWorkspace() );
-        }
+        console.log(Blockly.JSON.fromWorkspace(Blockly.getMainWorkspace()));
 
-        function interpretJSONarea() {
-            Blockly.JSON.toWorkspace( document.getElementById('json_area').value, Blockly.getMainWorkspace() );
-        }
+        translateToXML();
+      }
 
+      function translateToXML() {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append(
+          "xml",
+          Blockly.JSON.fromWorkspace(Blockly.getMainWorkspace())
+        );
+
+        var requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: urlencoded,
+          redirect: "follow",
+        };
+
+        fetch("https://a-rtest.vercel.app/xml", requestOptions)
+          .then((response) => response.text())
+          .then((result) => {
+            document.getElementById("json_area").value = result;
+          })
+          .catch((error) => console.log("error", error));
+      }
+
+      function interpretJSONarea() {
+        Blockly.JSON.toWorkspace(
+          document.getElementById("json_area").value,
+          Blockly.getMainWorkspace()
+        );
+      }
     </script>
     <style>
-        body {
-            background-color: #fff;
-            font-family: sans-serif;
-        }
-        h1 {
-            font-weight: normal;
-            font-size: 140%;
-        }
+      body {
+        background-color: #fff;
+        font-family: sans-serif;
+        padding: 2%;
+        box-sizing: border-box;
+        margin: 0;
+      }
+      h1 {
+        font-weight: normal;
+        font-size: 140%;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: row;
+        height: 100vh;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <br />
 
-<h1>An editor for <a href=http://www.json.org>JSON</a> structures made out of <a href="https://developers.google.com/blockly/">Blockly</a>-with-menus.</h1>
+    <div style="height: 75vh;" class="container">
+      <div id="blocklyDiv" style="width: 75%; height: 100%"></div>
 
-  <br/>
-
-  <div style="height: 600px">
-    <div id="blocklyDiv" style="float: left; width: 74%; height: 100%"></div>
-
-    <xml id="toolbox" style="display: none">
+      <xml id="toolbox" style="display: none">
         <block type="dictionary"></block>
         <block type="array"></block>
         <block type="number"></block>
         <block type="string"></block>
         <block type="true"></block>
         <block type="false"></block>
-    </xml>
+        <block type="node"></block>
+      </xml>
 
-    <div style="margin-left: 74%; width: 24%; height: 100%">
-        <button onclick='interpretJSONarea()'>interpret JSON from the textarea below</button>
-        <textarea id=json_area style="height: 95%; width: 100%"></textarea>
+      <div style="width: 25%; height: 100%">
+        <!-- <button onclick="interpretJSONarea()">
+          interpret JSON from the textarea below
+        </button> -->
+        <textarea id="json_area" style="height: 100%; width: 100%"></textarea>
+      </div>
     </div>
-  </div>
 
-  <script>
-
-	Blockly.inject(document.getElementById('blocklyDiv'), {
+    <script>
+      Blockly.inject(document.getElementById("blocklyDiv"), {
         //rtl: true,
-        toolbox: document.getElementById('toolbox'),
-        media: 'media/',    // to avoid reaching to the web for icons
-		sound: false,
-		collapse: true, comments: true, disable: false, scrollbars: true, trashcan: true // those ones are automatically true when there are categories
-	});
+        toolbox: document.getElementById("toolbox"),
+        media: "media/", // to avoid reaching to the web for icons
+        sound: false,
+        collapse: true,
+        comments: true,
+        disable: false,
+        scrollbars: true,
+        trashcan: true, // those ones are automatically true when there are categories
+      });
 
-    Blockly.JSON.toWorkspace( 'null', Blockly.getMainWorkspace() ); // dogfooding: load the initial state using our own JSON converter
+      Blockly.JSON.toWorkspace("null", Blockly.getMainWorkspace()); // dogfooding: load the initial state using our own JSON converter
 
-    Blockly.addChangeListener(updateJSONarea);
-  </script>
-
-</body>
+      Blockly.addChangeListener(updateJSONarea);
+    </script>
+  </body>
 </html>
