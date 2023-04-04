@@ -15,7 +15,6 @@ Blockly.JSON.fromWorkspace = function (workspace) {
       json_text += JSON.stringify(json_structure, null, 4) + "\n\n";
     }
   }
-
   return json_text;
 };
 
@@ -37,7 +36,6 @@ Blockly.JSON.generalBlockToObj = function (block) {
 
 Blockly.JSON["start"] = function (block) {
   var json = this.generalBlockToObj(block.getInputTargetBlock("json"));
-
   return json;
 };
 

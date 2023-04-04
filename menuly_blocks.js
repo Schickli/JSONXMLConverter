@@ -105,7 +105,7 @@ Blockly.Blocks["dictionary"] = {
       )
       .appendField(Blockly.keyValueArrow())
       .appendSelector(
-        ["string", "number", "true", "false", "dictionary", "array"],
+        ["string", "number", "true", "false", "dictionary", "array", "node"],
         Blockly.selectionArrow(),
         "null"
       );
@@ -146,19 +146,27 @@ Blockly.Blocks["node"] = {
     this.setOutput(true, ["element"]);
 
     this.appendDummyInput("open_bracket")
-      .appendField(" Node ")
+      .appendField("Node")
       .appendField(
         new Blockly.FieldTextbutton("+", function () {
           this.sourceBlock_.appendKeyValuePairInput();
         })
       );
 
-    
+    this.appendDummyInput("close_bracket").appendField("}");
+
+    // Add default KeyValuePairs
+    this.appendKeyValuePairInput("@key1", "value1");
+    this.appendKeyValuePairInput("@key2", "value2");
+
     this.setInputsInline(false);
   },
 
-  appendKeyValuePairInput: function (params) {
+  appendKeyValuePairInput: function (key, value) {
     var lastIndex = this.length++;
+
+    if(!key) key = "key_" + lastIndex; // default key
+    if(!value) value = "value_" + lastIndex; // default value
 
     var appended_input = this.appendValueInput("element_" + lastIndex);
     appended_input
@@ -167,10 +175,7 @@ Blockly.Blocks["node"] = {
           this.sourceBlock_.deleteKeyValuePairInput(appended_input);
         })
       )
-      .appendField(
-        new Blockly.FieldTextInput("@" + params),
-        "key_field_" + lastIndex
-      )
+      .appendField(new Blockly.FieldTextInput(key), "key_field_" + lastIndex)
       .appendField(Blockly.keyValueArrow())
       .appendSelector(
         ["string", "number", "true", "false", "dictionary", "array", "node"],

@@ -26,11 +26,9 @@
 
     <script>
       function updateJSONarea() {
-        document.getElementById("json_area").value = Blockly.JSON.fromWorkspace(
+        document.getElementById("json_area").value = (
           Blockly.getMainWorkspace()
         );
-
-        console.log(Blockly.JSON.fromWorkspace(Blockly.getMainWorkspace()));
 
         translateToXML();
       }
